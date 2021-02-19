@@ -57,10 +57,10 @@ class RayServiceProvider extends ServiceProvider
     protected function registerSettings(): self
     {
         $this->app->singleton(Settings::class, function () {
-            $settings = SettingsFactory::createFromConfigFile($this->app->configPath());
+            $configSettings = SettingsFactory::getSettingsFromConfig($this->app->configPath());
 
-            if ($settings->hasDefaultsSet()) {
-                return $settings->setDefaultSettings([
+            if (empty($configSettings)) {
+                return SettingsFactory::createFromArray([
                     'enable' => ! app()->environment('production'),
                     'send_cache_to_ray' => false,
                     'send_dumps_to_ray' => true,
@@ -71,6 +71,8 @@ class RayServiceProvider extends ServiceProvider
                     'send_views_to_ray' => false,
                 ]);
             }
+
+            return SettingsFactory::createFromConfigFile($this->app->configPath());
         });
 
         return $this;
