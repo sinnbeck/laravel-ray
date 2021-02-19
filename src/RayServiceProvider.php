@@ -29,7 +29,7 @@ use Spatie\Ray\Settings\SettingsFactory;
 
 class RayServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
         $this
             ->registerCommands()
@@ -42,7 +42,7 @@ class RayServiceProvider extends ServiceProvider
             ->registerPayloadFinder();
     }
 
-    public function boot()
+    public function boot(): void
     {
         $this->bootWatchers();
     }
@@ -59,16 +59,18 @@ class RayServiceProvider extends ServiceProvider
         $this->app->singleton(Settings::class, function () {
             $settings = SettingsFactory::createFromConfigFile($this->app->configPath());
 
-            return $settings->setDefaultSettings([
-                'enable' => ! app()->environment('production'),
-                'send_cache_to_ray' => false,
-                'send_dumps_to_ray' => true,
-                'send_jobs_to_ray' => false,
-                'send_log_calls_to_ray' => true,
-                'send_queries_to_ray' => false,
-                'send_requests_to_ray' => false,
-                'send_views_to_ray' => false,
-            ]);
+            if ($settings->hasDefaultsSet()) {
+                return $settings->setDefaultSettings([
+                    'enable' => ! app()->environment('production'),
+                    'send_cache_to_ray' => false,
+                    'send_dumps_to_ray' => true,
+                    'send_jobs_to_ray' => false,
+                    'send_log_calls_to_ray' => true,
+                    'send_queries_to_ray' => false,
+                    'send_requests_to_ray' => false,
+                    'send_views_to_ray' => false,
+                ]);
+            }
         });
 
         return $this;
